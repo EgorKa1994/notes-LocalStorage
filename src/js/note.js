@@ -61,6 +61,7 @@
     ++this.idCounter;
 
     this._createNoteList(this.data);
+
     this._checkEmptinessOfNoteDescription();
 
     this._resetForm(this.form);
@@ -69,7 +70,11 @@
   }
 
   _checkEmptinessOfNoteDescription() {
-    this.noteEditor.classList.toggle('invisible');
+    if (!this.oneNoteContent.innerHTML) {
+      this.noteEditor.classList.add('invisible');
+    } else {
+      this.noteEditor.classList.remove('invisible');
+    }
   }
 
   _handleChoosenNote(e) {
@@ -95,6 +100,8 @@
     });
 
     this._createOneNoteContent(this.oneNoteContent, contentOfChoosenNote);
+
+    this._checkEmptinessOfNoteDescription();
   }
 
   _createOneNoteContent(elem, noteData) {
