@@ -8,7 +8,11 @@
     this.toDoList = document.querySelector('#toDoList');
     this.noteDescription = document.querySelector('#noteDescription');
     this.oneNoteContent = document.querySelector('#oneNoteContent');
-    this.idOfNote = 0;
+    this.idCounter = 0;
+    this.noteId;
+    this.noteEditor = document.querySelector('.contentEditor');
+    this.removeButton = document.querySelector('#removeBtn');
+    this.editButtom = document.querySelector('#editBtn');
 
     this._init();
   }
@@ -17,6 +21,23 @@
     this.form.addEventListener('submit', this._handleSubmit.bind(this));
 
     this.noteList.addEventListener('click', this._handleChoosenNote.bind(this));
+
+    this.removeButton.addEventListener(
+      'click',
+      this._handleRemovingOfNote.bind(this)
+    );
+  }
+
+  _handleRemovingOfNote() {
+    this.oneNoteContent.innerHTML = '';
+    this.data.forEach((item, index) => {
+      if (this.noteId == item.id) {
+        this.data.splice(index, 1);
+        console.log(this.data);
+      }
+    });
+    this._checkEmptinessOfNoteDescription();
+    this._createNoteList(this.data);
   }
 
   _resetForm(form) {
@@ -35,15 +56,20 @@
       title: this.inputTitle.value,
       content: this.inputContain.value,
       time: timeData,
-      id: this.idOfNote,
+      id: this.idCounter,
     });
-    ++this.idOfNote;
+    ++this.idCounter;
 
     this._createNoteList(this.data);
+    this._checkEmptinessOfNoteDescription();
 
     this._resetForm(this.form);
     $('#formModal').modal('hide');
     $('#exampleModal').modal('hide');
+  }
+
+  _checkEmptinessOfNoteDescription() {
+    this.noteEditor.classList.toggle('invisible');
   }
 
   _handleChoosenNote(e) {
@@ -52,22 +78,22 @@
     arrOfNotes.forEach((item) => {
       item.classList.remove('active');
     });
-    let idOfNote;
     if (!e.target.hasAttribute('id')) {
-      idOfNote = e.target.parentNode.getAttribute('id');
+      this.noteId = e.target.parentNode.getAttribute('id');
     } else {
-      idOfNote = e.target.getAttribute('id');
+      this.noteId = e.target.getAttribute('id');
     }
-    let choosenLi = document.getElementById(idOfNote);
+    console.log(this.noteId);
+    let choosenLi = document.getElementById(this.noteId);
     choosenLi.classList.add('active');
     let contentOfChoosenNote = [];
     this.data.forEach((item, index) => {
-      if (idOfNote == item.id) {
+      if (this.noteId == item.id) {
         contentOfChoosenNote.push(this.data[index].content);
         contentOfChoosenNote.push(this.data[index].time);
       }
     });
-    console.log(contentOfChoosenNote);
+
     this._createOneNoteContent(this.oneNoteContent, contentOfChoosenNote);
   }
 
