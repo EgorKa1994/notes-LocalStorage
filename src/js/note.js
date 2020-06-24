@@ -12,7 +12,8 @@
     this.noteId;
     this.noteEditor = document.querySelector('.contentEditor');
     this.removeButton = document.querySelector('#removeBtn');
-    this.editButtom = document.querySelector('#editBtn');
+    this.editButton = document.querySelector('#editBtn');
+    this.closeButton = document.querySelector('#closeModal');
 
     this._init();
   }
@@ -26,6 +27,31 @@
       'click',
       this._handleRemovingOfNote.bind(this)
     );
+
+    this.editButton.addEventListener(
+      'click',
+      this._handleEditingOfNote.bind(this)
+    );
+
+    this.closeButton.addEventListener(
+      'click',
+      this._handleCloseModal.bind(this)
+    );
+  }
+
+  _handleCloseModal() {
+    this.oneNoteContent.classList.remove('underEdition');
+    this._resetForm(this.form);
+  }
+
+  _handleEditingOfNote() {
+    this.oneNoteContent.classList.add('underEdition');
+    this.data.forEach((item, index) => {
+      if (this.noteId == item.id) {
+        this.inputTitle.value = this.data[index].title;
+        this.inputContain.value = this.data[index].content;
+      }
+    });
   }
 
   _handleRemovingOfNote() {
@@ -52,20 +78,30 @@
   _handleSubmit(e) {
     e.preventDefault();
     let timeData = this._getDate();
-    this.data.push({
-      title: this.inputTitle.value,
-      content: this.inputContain.value,
-      time: timeData,
-      id: this.idCounter,
-    });
-    ++this.idCounter;
+
+    if (!this.oneNoteContent.classList.contains('underEdition')) {
+      this.data.push({
+        title: this.inputTitle.value,
+        content: this.inputContain.value,
+        time: timeData,
+        id: this.idCounter,
+      });
+      ++this.idCounter;
+    } else {
+      this.data.forEach((item, index) => {
+        if (this.noteId == item.id) {
+          this.data[index].title = this.inputTitle.value;
+          this.data[index].content = this.inputContain.value;
+        }
+      });
+    }
 
     this._createNoteList(this.data);
 
     this._checkEmptinessOfNoteDescription();
 
     this._resetForm(this.form);
-    $('#formModal').modal('hide');
+
     $('#exampleModal').modal('hide');
   }
 
@@ -88,7 +124,6 @@
     } else {
       this.noteId = e.target.getAttribute('id');
     }
-    console.log(this.noteId);
     let choosenLi = document.getElementById(this.noteId);
     choosenLi.classList.add('active');
     let contentOfChoosenNote = [];
