@@ -1,6 +1,6 @@
 ﻿export default class Note {
   constructor() {
-    this.data = [];
+    this.data = JSON.parse(localStorage.getItem('data')) || [];
     this.form = document.querySelector('form');
     this.inputTitle = document.querySelector('#title');
     this.inputContain = document.querySelector('#contain');
@@ -8,7 +8,7 @@
     this.toDoList = document.querySelector('#toDoList');
     this.noteDescription = document.querySelector('#noteDescription');
     this.oneNoteContent = document.querySelector('#oneNoteContent');
-    this.idCounter = 0;
+    this.idCounter = localStorage.getItem('id') || 0;
     this.noteId;
     this.noteEditor = document.querySelector('.contentEditor');
     this.removeButton = document.querySelector('#removeBtn');
@@ -62,8 +62,9 @@
         console.log(this.data);
       }
     });
+    localStorage.setItem('data', JSON.stringify(this.data));
     this._checkEmptinessOfNoteDescription();
-    this._createNoteList(this.data);
+    this.createNoteList(this.data);
   }
 
   _resetForm(form) {
@@ -87,6 +88,7 @@
         id: this.idCounter,
       });
       ++this.idCounter;
+      localStorage.setItem('id', this.idCounter);
     } else {
       this.data.forEach((item, index) => {
         if (this.noteId == item.id) {
@@ -96,7 +98,11 @@
       });
     }
 
-    this._createNoteList(this.data);
+    this.oneNoteContent.classList.remove('underEdition');
+
+    localStorage.setItem('data', JSON.stringify(this.data));
+
+    this.createNoteList(this.data);
 
     this._checkEmptinessOfNoteDescription();
 
@@ -150,7 +156,7 @@
     elem.append(pForContent);
   }
 
-  _createNoteList(curData) {
+  createNoteList(curData) {
     this.oneNoteContent.innerHTML = '';
     this.noteList.innerHTML = '';
     curData.forEach((item) => {
@@ -170,8 +176,6 @@
     newLi.append(newH3);
     newLi.append(timeDiv);
     newLi.setAttribute('id', note.id);
-
-    // newLi.addEventListener('click', this._handleChoosenNote.bind(this));
 
     return newLi;
   }
